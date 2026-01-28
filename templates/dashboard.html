@@ -1,0 +1,344 @@
+{% extends "base.html" %}
+
+{% block title %}대시보드 - SecureBank{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row scroll-animate">
+        <div class="col-md-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="mb-1">
+                        <i class="fas fa-tachometer-alt me-2 text-primary"></i>
+                        환영합니다, {{ user[5] or user[1] }}님!
+                    </h2>
+                    <p class="text-muted mb-0">SecureBank 온라인 뱅킹에 로그인하셨습니다.</p>
+                </div>
+                <div class="text-end">
+                    <div class="badge bg-success fs-6">
+                        <i class="fas fa-circle me-1"></i>온라인
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 빠른 통계 -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="stats-card bg-primary text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="mb-0" data-count="{{ user[8] or 0 }}">0</h4>
+                        <small>주계좌 잔액 (원)</small>
+                    </div>
+                    <i class="fas fa-wallet fa-2x opacity-75"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card bg-success text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="mb-0" data-count="{{ (user[8] or 0) // 2 }}">0</h4>
+                        <small>적금 잔액 (원)</small>
+                    </div>
+                    <i class="fas fa-piggy-bank fa-2x opacity-75"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card bg-info text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="mb-0" data-count="{{ transactions|length }}">0</h4>
+                        <small>이번 달 거래</small>
+                    </div>
+                    <i class="fas fa-exchange-alt fa-2x opacity-75"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card bg-warning text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="mb-0">A+</h4>
+                        <small>신용 등급</small>
+                    </div>
+                    <i class="fas fa-star fa-2x opacity-75"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 scroll-animate">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user me-2"></i>내 정보
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-4 text-center mb-3">
+                            <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                                <i class="fas fa-user fa-2x text-primary"></i>
+                            </div>
+                        </div>
+                        <div class="col-8">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <th width="40%">고객번호:</th>
+                                    <td><span class="badge bg-secondary">{{ user[0] }}</span></td>
+                                </tr>
+                                <tr>
+                                    <th>성명:</th>
+                                    <td><strong>{{ user[5] or user[1] }}</strong></td>
+                                </tr>
+                                <tr>
+                                    <th>사용자명:</th>
+                                    <td>{{ user[1] }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="30%">이메일:</th>
+                            <td>{{ user[3] }}</td>
+                        </tr>
+                        <tr>
+                            <th>연락처:</th>
+                            <td>{{ user[6] or '미등록' }}</td>
+                        </tr>
+                        <tr>
+                            <th>주소:</th>
+                            <td>{{ user[7] or '미등록' }}</td>
+                        </tr>
+                        <tr>
+                            <th>계정 상태:</th>
+                            <td>
+                                <span class="badge bg-{{ 'success' if user[9] == 'active' else 'warning' if user[9] == 'limited' else 'danger' }}">
+                                    <i class="fas fa-{{ 'check' if user[9] == 'active' else 'exclamation-triangle' if user[9] == 'limited' else 'times' }} me-1"></i>
+                                    {{ '정상' if user[9] == 'active' else '제한' if user[9] == 'limited' else '정지' }}
+                                </span>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 scroll-animate">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-credit-card me-2"></i>계좌 정보
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- 주계좌 -->
+                    <div class="card bg-gradient mb-3" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+                        <div class="card-body text-white">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">주계좌</h6>
+                                    <small class="opacity-75">{{ user[1] }}-001</small>
+                                </div>
+                                <i class="fas fa-university fa-2x opacity-75"></i>
+                            </div>
+                            <hr class="my-3" style="border-color: rgba(255,255,255,0.3);">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span>잔액</span>
+                                <h4 class="mb-0">₩{{ "{:,}".format(user[8] or 0) }}</h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 적금계좌 -->
+                    <div class="card bg-gradient" style="background: linear-gradient(135deg, #28a745, #20c997);">
+                        <div class="card-body text-white">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">적금계좌</h6>
+                                    <small class="opacity-75">{{ user[1] }}-002</small>
+                                </div>
+                                <i class="fas fa-piggy-bank fa-2x opacity-75"></i>
+                            </div>
+                            <hr class="my-3" style="border-color: rgba(255,255,255,0.3);">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span>잔액</span>
+                                <h4 class="mb-0">₩{{ "{:,}".format((user[8] or 0) // 2) }}</h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <strong>총 보유 자산:</strong>
+                        <h4 class="text-primary mb-0">₩{{ "{:,}".format((user[8] or 0) + (user[8] or 0) // 2) }}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4 scroll-animate">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-history me-2"></i>최근 거래 내역
+                    </h5>
+                    <button class="btn btn-sm btn-outline-light">
+                        <i class="fas fa-download me-1"></i>내보내기
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    {% if transactions %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>날짜</th>
+                                    <th>거래유형</th>
+                                    <th>거래처</th>
+                                    <th>금액</th>
+                                    <th>잔액</th>
+                                    <th>상태</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for transaction in transactions %}
+                                <tr>
+                                    <td>
+                                        <i class="fas fa-calendar-alt me-2 text-muted"></i>
+                                        {{ transaction[3] }}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if transaction[0] == 'deposit' else 'danger' }}">
+                                            <i class="fas fa-{{ 'arrow-down' if transaction[0] == 'deposit' else 'arrow-up' }} me-1"></i>
+                                            {{ '입금' if transaction[0] == 'deposit' else '출금' }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <i class="fas fa-building me-2 text-muted"></i>
+                                        {{ transaction[2] }}
+                                    </td>
+                                    <td class="text-{{ 'success' if transaction[1] > 0 else 'danger' }}">
+                                        <strong>{{ '+' if transaction[1] > 0 else '' }}₩{{ "{:,}".format(transaction[1]) }}</strong>
+                                    </td>
+                                    <td>₩{{ "{:,}".format(transaction[4]) }}</td>
+                                    <td>
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check me-1"></i>완료
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">거래 내역이 없습니다.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4 mb-4 scroll-animate">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-cog me-2"></i>빠른 메뉴
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <button class="btn btn-outline-primary w-100 h-100 py-3">
+                                <i class="fas fa-exchange-alt fa-2x d-block mb-2"></i>
+                                <span>계좌이체</span>
+                            </button>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-outline-success w-100 h-100 py-3">
+                                <i class="fas fa-file-invoice-dollar fa-2x d-block mb-2"></i>
+                                <span>공과금 납부</span>
+                            </button>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-outline-info w-100 h-100 py-3">
+                                <i class="fas fa-chart-line fa-2x d-block mb-2"></i>
+                                <span>투자상품</span>
+                            </button>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{{ url_for('logout') }}" class="btn btn-outline-danger w-100 h-100 py-3 text-decoration-none">
+                                <i class="fas fa-sign-out-alt fa-2x d-block mb-2"></i>
+                                <span>로그아웃</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 실시간 시계
+    function updateClock() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('ko-KR');
+        const dateString = now.toLocaleDateString('ko-KR');
+        
+        // 시계 요소가 있다면 업데이트
+        const clockElement = document.getElementById('clock');
+        if (clockElement) {
+            clockElement.textContent = `${dateString} ${timeString}`;
+        }
+    }
+
+    // 1초마다 시계 업데이트
+    setInterval(updateClock, 1000);
+    updateClock(); // 즉시 실행
+
+    // 카드 호버 효과 강화
+    document.querySelectorAll('.stats-card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-10px) scale(1.02)';
+            this.style.transition = 'all 0.3s ease';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+
+    // 거래 내역 행 클릭 효과
+    document.querySelectorAll('tbody tr').forEach(row => {
+        row.addEventListener('click', function() {
+            // 선택 효과
+            document.querySelectorAll('tbody tr').forEach(r => r.classList.remove('table-active'));
+            this.classList.add('table-active');
+            
+            // 펄스 효과
+            this.style.animation = 'pulse 0.5s ease-in-out';
+            setTimeout(() => {
+                this.style.animation = '';
+            }, 500);
+        });
+    });
+</script>
+{% endblock %}

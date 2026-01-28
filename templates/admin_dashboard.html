@@ -1,0 +1,306 @@
+{% extends "base.html" %}
+
+{% block title %}관리자 대시보드 - SecureBank{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- 헤더 -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2><i class="fas fa-shield-alt me-2 text-danger"></i>SecureBank 관리자 시스템</h2>
+            <p class="lead text-muted">전체 시스템 관리 및 고객 서비스 통합 관리</p>
+        </div>
+    </div>
+
+    <!-- 통계 카드 -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>{{ total_customers }}</h4>
+                            <p class="mb-0">총 고객 수</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-users fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>{{ active_customers }}</h4>
+                            <p class="mb-0">활성 고객</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-user-check fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>₩{{ "{:,}".format(total_deposits) }}</h4>
+                            <p class="mb-0">총 예치금</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-won-sign fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>{{ today_transactions }}</h4>
+                            <p class="mb-0">오늘 거래 건수</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-exchange-alt fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 메인 콘텐츠 -->
+    <div class="row">
+        <!-- 고객 관리 -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                    <h5><i class="fas fa-users-cog me-2"></i>고객 관리</h5>
+                    <div>
+                        <button class="btn btn-sm btn-outline-light me-2">
+                            <i class="fas fa-plus"></i> 신규 고객
+                        </button>
+                        <a href="{{ url_for('admin_reports') }}" class="btn btn-sm btn-outline-light">
+                            <i class="fas fa-chart-bar"></i> 상세 보고서
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>고객번호</th>
+                                    <th>성명</th>
+                                    <th>사용자명</th>
+                                    <th>이메일</th>
+                                    <th>연락처</th>
+                                    <th>잔액</th>
+                                    <th>상태</th>
+                                    <th>가입일</th>
+                                    <th>최근 로그인</th>
+                                    <th>관리</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for customer in customers %}
+                                <tr>
+                                    <td><strong>{{ customer[0] }}</strong></td>
+                                    <td>{{ customer[2] or customer[1] }}</td>
+                                    <td>{{ customer[1] }}</td>
+                                    <td>{{ customer[3] }}</td>
+                                    <td>{{ customer[4] or '미등록' }}</td>
+                                    <td class="text-end">₩{{ "{:,}".format(customer[5] or 0) }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if customer[6] == 'active' else 'warning' if customer[6] == 'limited' else 'danger' }}">
+                                            {{ '정상' if customer[6] == 'active' else '제한' if customer[6] == 'limited' else '정지' }}
+                                        </span>
+                                    </td>
+                                    <td>{{ customer[7] }}</td>
+                                    <td>{{ customer[8] }}</td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{{ url_for('customer_detail', customer_id=customer[0]) }}" class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <button class="btn btn-outline-warning btn-sm">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-outline-danger btn-sm">
+                                                <i class="fas fa-ban"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 사이드바 -->
+        <div class="col-md-4">
+            <!-- 계정 상태 통계 -->
+            <div class="card mb-3">
+                <div class="card-header bg-secondary text-white">
+                    <h6><i class="fas fa-chart-pie me-2"></i>계정 상태 분포</h6>
+                </div>
+                <div class="card-body">
+                    {% for status, count in status_stats %}
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="badge bg-{{ 'success' if status == 'active' else 'warning' if status == 'limited' else 'danger' }}">
+                            {{ '정상' if status == 'active' else '제한' if status == 'limited' else '정지' }}
+                        </span>
+                        <strong>{{ count }}명</strong>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- 시스템 알림 -->
+            <div class="card mb-3">
+                <div class="card-header bg-warning text-dark">
+                    <h6><i class="fas fa-exclamation-triangle me-2"></i>시스템 알림</h6>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info alert-sm mb-2">
+                        <small><i class="fas fa-info-circle me-1"></i> 시스템 백업이 완료되었습니다.</small>
+                    </div>
+                    <div class="alert alert-warning alert-sm mb-2">
+                        <small><i class="fas fa-exclamation-triangle me-1"></i> 3건의 의심스러운 로그인 시도가 감지되었습니다.</small>
+                    </div>
+                    <div class="alert alert-success alert-sm mb-0">
+                        <small><i class="fas fa-check-circle me-1"></i> 모든 시스템이 정상 작동 중입니다.</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 빠른 작업 -->
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h6><i class="fas fa-bolt me-2"></i>빠른 작업</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-user-plus me-2"></i>신규 고객 등록
+                        </button>
+                        <button class="btn btn-outline-success btn-sm">
+                            <i class="fas fa-file-export me-2"></i>데이터 내보내기
+                        </button>
+                        <button class="btn btn-outline-warning btn-sm">
+                            <i class="fas fa-database me-2"></i>시스템 백업
+                        </button>
+                        <button class="btn btn-outline-danger btn-sm">
+                            <i class="fas fa-shield-alt me-2"></i>보안 점검
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 최근 거래 내역 -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5><i class="fas fa-history me-2"></i>최근 거래 내역</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-striped mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>거래번호</th>
+                                    <th>고객명</th>
+                                    <th>사용자명</th>
+                                    <th>거래유형</th>
+                                    <th>금액</th>
+                                    <th>거래처</th>
+                                    <th>거래일시</th>
+                                    <th>거래 후 잔액</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for transaction in transactions %}
+                                <tr>
+                                    <td><strong>#{{ transaction[0] }}</strong></td>
+                                    <td>{{ transaction[2] or transaction[1] }}</td>
+                                    <td>{{ transaction[1] }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if transaction[3] == 'deposit' else 'danger' }}">
+                                            {{ '입금' if transaction[3] == 'deposit' else '출금' }}
+                                        </span>
+                                    </td>
+                                    <td class="text-{{ 'success' if transaction[4] > 0 else 'danger' }} text-end">
+                                        {{ '+' if transaction[4] > 0 else '' }}₩{{ "{:,}".format(transaction[4]) }}
+                                    </td>
+                                    <td>{{ transaction[5] }}</td>
+                                    <td>{{ transaction[6] }}</td>
+                                    <td class="text-end">₩{{ "{:,}".format(transaction[7]) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 시스템 로그 -->
+    <div class="row mt-4 mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h5><i class="fas fa-clipboard-list me-2"></i>시스템 로그</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-sm mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>로그번호</th>
+                                    <th>사용자</th>
+                                    <th>작업</th>
+                                    <th>IP 주소</th>
+                                    <th>시간</th>
+                                    <th>상세 내용</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for log in logs %}
+                                <tr>
+                                    <td><small>#{{ log[0] }}</small></td>
+                                    <td><small>{{ log[1] or 'System' }}</small></td>
+                                    <td>
+                                        <small>
+                                            <span class="badge bg-{{ 'primary' if 'login' in log[2] else 'info' if 'view' in log[2] else 'warning' }}">
+                                                {{ log[2] }}
+                                            </span>
+                                        </small>
+                                    </td>
+                                    <td><small>{{ log[3] }}</small></td>
+                                    <td><small>{{ log[4] }}</small></td>
+                                    <td><small>{{ log[5] }}</small></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

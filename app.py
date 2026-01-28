@@ -8,7 +8,6 @@ app.secret_key = 'your-secret-key-here'
 
 # 데이터베이스 초기화
 def init_db():
-    # 기존 데이터베이스 파일 삭제 (새로운 스키마로 재생성)
     import os
     if os.path.exists('users.db'):
         os.remove('users.db')
@@ -389,4 +388,5 @@ def logout():
 
 if __name__ == '__main__':
     init_db()
+
     app.run(debug=True, host='0.0.0.0', port=5000)

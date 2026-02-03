@@ -54,6 +54,14 @@ cursor.execute(query)
 비밀번호: (아무거나)
 ```
 
+```
+' OR '1'='1' # (MySQL/MariaDB에서 #은 주석)
+
+' OR '1'='1' /* (Multi-line 주석 시작)
+
+admin' -- (아이디를 admin으로 고정하고 뒷부분 비밀번호 체크 로직을 무시)
+```
+
 **실행되는 쿼리:**
 ```sql
 SELECT * FROM users WHERE username = 'admin' OR '1'='1' --' AND password = '해시값'
@@ -1297,5 +1305,6 @@ sql_injection_simulator/
 1. SQL 인젝션 취약점의 원리 이해
 2. 취약한 코드와 안전한 코드의 차이점 학습
 3. 실제 공격 시나리오 체험
+
 
 

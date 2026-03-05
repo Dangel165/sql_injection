@@ -8,6 +8,7 @@ app.secret_key = 'your-secret-key-here'
 
 # 데이터베이스 초기화
 def init_db():
+    # 기존 데이터베이스 파일 삭제 (새로운 스키마로 재생성)
     import os
     if os.path.exists('users.db'):
         os.remove('users.db')
@@ -152,10 +153,16 @@ def login():
                 return redirect(url_for('dashboard'))
             else:
                 flash('아이디 또는 비밀번호가 잘못되었습니다.', 'error')
-        except Exception as e:
-            flash('로그인 중 오류가 발생했습니다.', 'error')
-        finally:
+        except sqlite3.Error as e:
+            # 오류 기반 공격을 위해 SQL 오류 메시지를 그대로 노출
+            flash(f'데이터베이스 오류: {str(e)}', 'error')
             conn.close()
+            return render_template('login.html')
+        except Exception as e:
+            flash(f'오류 발생: {str(e)}', 'error')
+        finally:
+            if conn:
+                conn.close()
     
     return render_template('login.html')
 
@@ -388,5 +395,4 @@ def logout():
 
 if __name__ == '__main__':
     init_db()
-
     app.run(debug=True, host='0.0.0.0', port=5000)

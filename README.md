@@ -7,19 +7,26 @@
 # 배치 파일 실행
 run.bat
 ```
-###작동하는 공격
+### ✅ 성공적인 공격 벡터 (Success)
 
-✅ 인증 우회 (Authentication Bypass) - admin' OR '1'='1' --
-✅ UNION 기반 공격 - 부분적으로 작동 (SQLite 제한)
-✅ Boolean 기반 블라인드 - ' OR 1=1 --
-✅ 오류 기반 공격 - 이제 수정되어 작동
-✅ ORDER BY로 컬럼 수 확인
-###작동하지 않거나 제한적인 공격
+| 공격 유형 | 상태 | 상세 설명 |
+| :--- | :---: | :--- |
+| **인증 우회 (Auth Bypass)** | ✅ | `admin' OR '1'='1' --`를 이용한 로그인 로직 무력화 |
+| **UNION 기반 공격** | ✅ | SQLite 제약 조건 내에서 데이터 추출 성공 |
+| **Boolean 기반 Blind** | ✅ | 참/거짓 판단을 통한 데이터 덤프 |
+| **오류 기반 공격 (Error-based)** | ✅ | 데이터베이스 에러 메시지를 통한 정보 유출 |
+| **컬럼 확인 (ORDER BY)** | ✅ | `ORDER BY`를 통한 테이블 구조 및 컬럼 수 파악 |
 
-❌ 시간 기반 블라인드 - SQLite에는 SLEEP() 함수가 없음
-❌ 스택 쿼리 (Stacked Queries) - Python sqlite3는 기본적으로 다중 쿼리 실행을 차단
-❌ NoSQL 인젝션 - 이 시스템은 SQL 데이터베이스만 사용
-❌ MySQL/PostgreSQL 특화 공격 - SQLite를 사용하므로 불가능
+### ❌ 차단되거나 제한적인 공격 벡터 (Blocked/Limited)
+
+| 공격 유형 | 상태 | 제한 사유 |
+| :--- | :---: | :--- |
+| **시간 기반 Blind** | ❌ | SQLite의 `SLEEP()` 함수 부재 및 시간 지연 차단 |
+| **스택 쿼리 (Stacked Queries)** | ❌ | Python `sqlite3` 라이브러리의 다중 쿼리 실행 차단 |
+| **NoSQL 인젝션** | ❌ | 관계형 데이터베이스(SQL) 사용 환경 |
+| **DB 특화 공격** | ❌ | MySQL/PostgreSQL 전용 문법 사용 불가 (SQLite 전용) |
+
+---
 
 ### 수동 실행
 ```bash
@@ -1318,6 +1325,7 @@ sql_injection_simulator/
 1. SQL 인젝션 취약점의 원리 이해
 2. 취약한 코드와 안전한 코드의 차이점 학습
 3. 실제 공격 시나리오 체험
+
 
 
 

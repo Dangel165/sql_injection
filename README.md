@@ -7,6 +7,19 @@
 # 배치 파일 실행
 run.bat
 ```
+###작동하는 공격
+
+✅ 인증 우회 (Authentication Bypass) - admin' OR '1'='1' --
+✅ UNION 기반 공격 - 부분적으로 작동 (SQLite 제한)
+✅ Boolean 기반 블라인드 - ' OR 1=1 --
+✅ 오류 기반 공격 - 이제 수정되어 작동
+✅ ORDER BY로 컬럼 수 확인
+###작동하지 않거나 제한적인 공격
+
+❌ 시간 기반 블라인드 - SQLite에는 SLEEP() 함수가 없음
+❌ 스택 쿼리 (Stacked Queries) - Python sqlite3는 기본적으로 다중 쿼리 실행을 차단
+❌ NoSQL 인젝션 - 이 시스템은 SQL 데이터베이스만 사용
+❌ MySQL/PostgreSQL 특화 공격 - SQLite를 사용하므로 불가능
 
 ### 수동 실행
 ```bash
@@ -1305,6 +1318,7 @@ sql_injection_simulator/
 1. SQL 인젝션 취약점의 원리 이해
 2. 취약한 코드와 안전한 코드의 차이점 학습
 3. 실제 공격 시나리오 체험
+
 
 
 
